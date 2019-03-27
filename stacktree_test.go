@@ -46,9 +46,14 @@ func TestPrintStackTrace(t *testing.T) {
 		},
 
 		{
-			"ItShouldPrintInvocationsOfTwoStackTraceLines",
+			"ItShouldPrintInvocationsOfTwoDifferentStackTraceLines",
 			"main, workloop, select\nmain, parse_args",
 			"2 main\n\t1 workloop\n\t1 select\n\t1 parse_args\n",
+		},
+		{
+			"ItShouldPrintInvocationsOfTwoEqualStackTraceLines",
+			"main, workloop, select\nmain, workloop, select",
+			"2 main\n\t2 workloop\n\t2 select\n",
 		},
 		//{
 		//	"ItShouldPrintInvocationsOfArbitraryStackTraceLines",

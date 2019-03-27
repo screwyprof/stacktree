@@ -43,6 +43,27 @@ func (n *Node) AddChildNode(child *Node) {
 	n.Children = append(n.Children, child)
 }
 
+func (n *Node) FindByNameBFS(root *Node, name string) *Node {
+	if root == nil {
+		return nil
+	}
+	queue := make([]*Node, 0)
+	queue = append(queue, root)
+	for len(queue) > 0 {
+		nextUp := queue[0]
+		queue = queue[1:]
+		if nextUp.Name == name {
+			return nextUp
+		}
+		if len(nextUp.Children) > 0 {
+			for _, child := range nextUp.Children {
+				queue = append(queue, child)
+			}
+		}
+	}
+	return nil
+}
+
 func (n *Node) FindByNameDFS(node *Node, name string) *Node {
 	if node == nil {
 		return nil
