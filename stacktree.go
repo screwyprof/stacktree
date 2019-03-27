@@ -12,17 +12,23 @@ type Node struct {
 	Child       *Node
 }
 
-func (n *Node) AddChild(child *Node) {
-	n.Child = child
+func (n *Node) Print(w io.Writer) {
+	_, _ = fmt.Fprintf(w, "%d %s", n.invocations, n.name)
 }
 
 func PrintStackTrace(input string, w io.Writer) {
 	var invocations = make(map[string]int)
+	var stack *Node
 
 	lines := strings.Split(input, "\n")
 	for _, line := range lines {
 		invocations[line]++
 	}
 
-	_, _ = fmt.Fprintf(w, "%d %s", invocations[lines[0]], lines[0])
+	stack = &Node{
+		name:        lines[0],
+		invocations: invocations[lines[0]],
+	}
+
+	stack.Print(w)
 }
