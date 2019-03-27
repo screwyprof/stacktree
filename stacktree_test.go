@@ -36,7 +36,9 @@ func TestPrintStackTrace(t *testing.T) {
 		output string
 	}{
 		{"ItShouldPrintAnInvocationOfAFunction", "main", "1 main"},
+		{"ItShouldPrintAnInvocationOfAnotherFunction", "foo", "1 foo"},
 		{"ItShouldPrintInvocationsOfAFunction", "main\nmain\nmain", "3 main"},
+		//{"ItShouldPrintAnInvocationOfANestedFunction", "main workloop", "1 main\n\tworkloop"},
 	}
 
 	for _, tc := range cases {
