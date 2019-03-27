@@ -75,9 +75,11 @@ func (n *Node) FindByNameDFS(node *Node, name string) *Node {
 	}
 
 	if len(node.Children) > 0 {
-		for _, child := range node.Children {
-			n.FindByNameDFS(child, name)
+		var result *Node
+		for i := 0; result == nil && i < len(node.Children); i++ {
+			result = n.FindByNameDFS(node.Children[i], name)
 		}
+		return result
 	}
 	return nil
 }

@@ -50,7 +50,15 @@ func TestPrintStackTrace(t *testing.T) {
 			equals(t, tc.output, buffer.String())
 		})
 	}
+}
 
+func BenchmarkPrintStackTrace(b *testing.B) {
+	buffer := bytes.Buffer{}
+	for n := 0; n < b.N; n++ {
+		stacktree.PrintStackTrace(
+			"4 main\n\t3 workloop\n\t\t1 parse_data\n\t\t\t1 parse_entry\n\t\t2 select\n\t1 parse_args\n",
+			&buffer)
+	}
 }
 
 // equals fails the test if exp is not equal to act.
