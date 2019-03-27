@@ -1,20 +1,9 @@
 package stacktree
 
 import (
-	"fmt"
 	"io"
 	"strings"
 )
-
-type Node struct {
-	name        string
-	invocations int
-	Child       *Node
-}
-
-func (n *Node) Print(w io.Writer) {
-	_, _ = fmt.Fprintf(w, "%d %s", n.invocations, n.name)
-}
 
 func PrintStackTrace(input string, w io.Writer) {
 	var invocations = make(map[string]int)
@@ -22,12 +11,19 @@ func PrintStackTrace(input string, w io.Writer) {
 
 	lines := strings.Split(input, "\n")
 	for _, line := range lines {
-		invocations[line]++
-	}
+		fns := strings.Split(line, ",")
 
-	stack = &Node{
-		name:        lines[0],
-		invocations: invocations[lines[0]],
+		fnsLen := len(fns)
+		for i := 0; i < fnsLen; i++ {
+			fn := fns[i]
+			invocations[fn]++
+		}
+
+		stack = New(fns[0], invocations[fns[0]])
+
+		for i := 1; i < fnsLen; i++ {
+			stack.AddChild(strings.TrimSpace(fns[i]), invocations[fns[i]])
+		}
 	}
 
 	stack.Print(w)
