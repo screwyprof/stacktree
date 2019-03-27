@@ -50,6 +50,11 @@ func TestPrintStackTrace(t *testing.T) {
 			"main, workloop, select\nmain, parse_args",
 			"2 main\n\t1 workloop\n\t1 select\n\t1 parse_args\n",
 		},
+		//{
+		//	"ItShouldPrintInvocationsOfArbitraryStackTraceLines",
+		//	"main, workloop, select\nmain, parse_args\nmain, workloop, parse_data, parse_entry\nmain, workloop, select",
+		//	"4 main\n\t3 workloop\n\t\t1 parse_data\n\t\t\t1 parse_entry\n\t\t2 select\n\t1 parse_args",
+		//},
 	}
 
 	for _, tc := range cases {

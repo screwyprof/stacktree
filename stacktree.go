@@ -18,33 +18,57 @@ import (
 //}
 
 func PrintStackTrace(input string, w io.Writer) {
-	var invocations = make(map[string]int)
-	var stack *Node
-
-	lines := strings.Split(input, "\n")
+	lines := parseLines(input)
 	//sort.Sort(byLength(lines))
-
-	for _, line := range lines {
-		fns := strings.Split(line, ",")
-
-		fnsLen := len(fns)
-		for i := 0; i < fnsLen; i++ {
-			fn := fns[i]
-			invocations[fn]++
-		}
-
-		stack = stack.FindByNameDFS(stack, fns[0])
-		if stack == nil {
-			stack = New(fns[0], invocations[fns[0]])
-		} else {
-			stack.Invocations = invocations[fns[0]]
-		}
-
-		for i := 1; i < fnsLen; i++ {
-			stack.AddChild(strings.TrimSpace(fns[i]), invocations[fns[i]])
-		}
-
-	}
-
+	stack := buildStackFromFuncs(lines)
 	stack.Print(w)
+}
+
+func parseLines(input string) []string {
+	return strings.Split(input, "\n")
+}
+
+func parseALLFuncs(lines []string) []string {
+	var fns []string
+	for _, line := range lines {
+		fns = append(fns, parseFuncs(line)...)
+	}
+	return fns
+}
+
+func parseFuncs(line string) []string {
+	fns := strings.Split(line, ",")
+	for idx := range fns {
+		fns[idx] = strings.TrimSpace(fns[idx])
+	}
+	return fns
+}
+
+func countInvocations(fns []string) map[string]int {
+	var invocations = make(map[string]int)
+	for i := 0; i < len(fns); i++ {
+		invocations[fns[i]]++
+	}
+	return invocations
+}
+
+func buildStackFromFuncs(lines []string) *Node {
+	fns := parseALLFuncs(lines)
+
+	var stack *Node
+	invocations := countInvocations(fns)
+
+	stack = stack.FindByNameDFS(stack, fns[0])
+	if stack == nil {
+		stack = New(fns[0], invocations[fns[0]])
+	} else {
+		stack.Invocations = invocations[fns[0]]
+	}
+	for i := 1; i < len(fns); i++ {
+		child := stack.FindByNameDFS(stack, fns[i])
+		if child == nil {
+			stack.AddChild(fns[i], invocations[fns[i]])
+		}
+	}
+	return stack
 }
