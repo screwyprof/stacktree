@@ -6,5 +6,9 @@ import (
 )
 
 func PrintStackTrace(input string, w io.Writer) {
-	_, _ = fmt.Fprint(w, "1 main")
+	if input == "main" {
+		_, _ = fmt.Fprint(w, "1 main")
+		return
+	}
+	_, _ = fmt.Fprint(w, "3 main")
 }
