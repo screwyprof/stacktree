@@ -8,27 +8,6 @@ import (
 	"github.com/screwyprof/stacktree"
 )
 
-//1. Parse a list of stack traces
-//2. Parse stack trace
-//3. Parse functions
-//4. Add function as a Tree Node
-//5. Count function invocations
-//6. Print an intended diagram to Stdout
-
-// Input:
-// main, workloop, select
-// main, parse_args
-// main, workloop, parse_data, parse_entry
-// main, workloop, select
-
-// Output:
-// 4 main
-//    3 workLoop
-//        1 parse_data
-//            1 parse_entry
-//        2 select
-//    1 parse_args
-
 func TestPrintStackTrace(t *testing.T) {
 	cases := []struct {
 		name   string
@@ -42,44 +21,36 @@ func TestPrintStackTrace(t *testing.T) {
 		{
 			"ItShouldPrintInvocationsOfADeeplyNestedFunction",
 			"main, workloop, parse_data, parse_entry",
-			"1 main\n\t1 workloop\n\t1 parse_data\n\t1 parse_entry\n",
+			"1 main\n\t1 workloop\n\t\t1 parse_data\n\t\t\t1 parse_entry\n",
 		},
 
 		{
 			"ItShouldPrintInvocationsOfTwoDifferentStackTraceLines",
 			"main, workloop, select\nmain, parse_args",
-			"2 main\n\t1 workloop\n\t1 select\n\t1 parse_args\n",
+			"2 main\n\t1 workloop\n\t\t1 select\n\t1 parse_args\n",
 		},
 		{
 			"ItShouldPrintInvocationsOfTwoEqualStackTraceLines",
 			"main, workloop, select\nmain, workloop, select",
-			"2 main\n\t2 workloop\n\t2 select\n",
+			"2 main\n\t2 workloop\n\t\t2 select\n",
 		},
-		//{
-		//	"ItShouldPrintInvocationsOfArbitraryStackTraceLines",
-		//	"main, workloop, select\nmain, parse_args\nmain, workloop, parse_data, parse_entry\nmain, workloop, select",
-		//	"4 main\n\t3 workloop\n\t\t1 parse_data\n\t\t\t1 parse_entry\n\t\t2 select\n\t1 parse_args",
-		//},
+		{
+			"ItShouldPrintInvocationsOfArbitraryStackTraceLines",
+			"main, workloop, select\nmain, parse_args\nmain, workloop, parse_data, parse_entry\nmain, workloop, select",
+			"4 main\n\t3 workloop\n\t\t1 parse_data\n\t\t\t1 parse_entry\n\t\t2 select\n\t1 parse_args\n",
+		},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			buffer := bytes.Buffer{}
-			//
+
 			stacktree.PrintStackTrace(tc.input, &buffer)
 
 			equals(t, tc.output, buffer.String())
 		})
 	}
 
-}
-
-// ok fails the test if an err is not nil.
-func ok(tb testing.TB, err error) {
-	tb.Helper()
-	if err != nil {
-		tb.Fatalf("\033[31munexpected error: %v\033[39m\n\n", err)
-	}
 }
 
 // equals fails the test if exp is not equal to act.

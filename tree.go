@@ -32,10 +32,11 @@ func (n *Node) traverse(w io.Writer, node *Node, depth int) {
 	}
 }
 
-func (n *Node) AddChild(name string, invocations int) {
+func (n *Node) AddChild(name string, invocations int) *Node {
 	child := New(name, invocations)
 	child.setParent(n)
 	n.Children = append(n.Children, child)
+	return child
 }
 
 func (n *Node) AddChildNode(child *Node) {

@@ -2,11 +2,25 @@ package stacktree
 
 import (
 	"io"
+	"sort"
 	"strings"
 )
 
+type byLength []string
+
+func (s byLength) Len() int {
+	return len(s)
+}
+func (s byLength) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s byLength) Less(i, j int) bool {
+	return len(s[i]) > len(s[j])
+}
+
 func PrintStackTrace(input string, w io.Writer) {
 	lines := parseLines(input)
+	sort.Sort(byLength(lines))
 	stack := buildStackFromLines(lines)
 	stack.Print(w)
 }
@@ -47,24 +61,27 @@ func buildStackFromLines(lines []string) *Node {
 		fns := parseFuncs(line)
 
 		// create root
-		stackTree = stackTree.FindByNameDFS(stackTree, fns[0])
+		stackTree = stackTree.FindByNameBFS(stackTree, fns[0])
 		if stackTree == nil {
 			stackTree = New(fns[0], invocations[fns[0]])
 		} else {
 			stackTree.Invocations = invocations[fns[0]]
 		}
 
-		var child *Node
-		for i := 1; i < len(fns); i++ {
-			child = stackTree.FindByNameBFS(stackTree, fns[i])
-			if child == nil {
-				//fmt.Println("child not found")
-				stackTree.AddChild(fns[i], invocations[fns[i]])
-			} else {
-				//fmt.Println("child found")
-			}
-		}
+		addChild(stackTree, fns[1:], invocations)
 	}
 
 	return stackTree
+}
+
+func addChild(parent *Node, fns []string, invocations map[string]int) {
+	if len(fns) < 1 {
+		return
+	}
+	var child *Node
+	child = parent.FindByNameBFS(parent, fns[0])
+	if child == nil {
+		child = parent.AddChild(fns[0], invocations[fns[0]])
+	}
+	addChild(child, fns[1:], invocations)
 }
