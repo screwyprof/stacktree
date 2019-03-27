@@ -44,12 +44,18 @@ func TestPrintStackTrace(t *testing.T) {
 			"main, workloop, parse_data, parse_entry",
 			"1 main\n\t1 workloop\n\t1 parse_data\n\t1 parse_entry\n",
 		},
+
+		{
+			"ItShouldPrintInvocationsOfTwoStackTraceLines",
+			"main, workloop, select\nmain, parse_args",
+			"2 main\n\t1 workloop\n\t1 select\n\t1 parse_args\n",
+		},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			buffer := bytes.Buffer{}
-
+			//
 			stacktree.PrintStackTrace(tc.input, &buffer)
 
 			equals(t, tc.output, buffer.String())

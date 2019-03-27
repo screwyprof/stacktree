@@ -43,6 +43,23 @@ func (n *Node) AddChildNode(child *Node) {
 	n.Children = append(n.Children, child)
 }
 
+func (n *Node) FindByNameDFS(node *Node, name string) *Node {
+	if node == nil {
+		return nil
+	}
+
+	if node.Name == name {
+		return node
+	}
+
+	if len(node.Children) > 0 {
+		for _, child := range node.Children {
+			n.FindByNameDFS(child, name)
+		}
+	}
+	return nil
+}
+
 func (n *Node) setParent(parent *Node) {
 	n.Parent = parent
 }
