@@ -59,10 +59,9 @@ func buildStackFromInput(input string) *Node {
 func buildTreeRoot(stackTree *Node, fns []string, invocations map[string]int) *Node {
 	stackTree = stackTree.FindByNameDFS(stackTree, fns[0])
 	if stackTree == nil {
-		stackTree = New(fns[0], invocations[fns[0]])
-	} else {
-		stackTree.Invocations = invocations[fns[0]]
+		return New(fns[0], invocations[fns[0]])
 	}
+	stackTree.Invocations = invocations[fns[0]]
 	return stackTree
 }
 
