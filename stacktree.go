@@ -7,20 +7,28 @@ import (
 )
 
 func PrintStackTrace(input string, w io.Writer) {
-	stack := buildStackFromInput(input)
-	stack.Print(w)
+	stackTree := buildStackTree(input)
+	stackTree.Print(w)
+}
+
+func buildStackTree(input string) *Node {
+	lines := parseLines(input)
+	sort.Sort(byLength(lines))
+
+	stackTree := New("root", 0)
+	for idx := range lines {
+		fns := parseFuncs(lines[idx])
+		invocations := countFnInvocations(fns)
+
+		stackTree = createTree(stackTree, fns, invocations)
+		addChild(stackTree, fns[1:], invocations)
+	}
+
+	return stackTree
 }
 
 func parseLines(input string) []string {
 	return strings.Split(input, "\n")
-}
-
-func parseALLFuncs(lines []string) []string {
-	var fns []string
-	for _, line := range lines {
-		fns = append(fns, parseFuncs(line)...)
-	}
-	return fns
 }
 
 func parseFuncs(line string) []string {
@@ -31,48 +39,32 @@ func parseFuncs(line string) []string {
 	return fns
 }
 
-func countInvocations(fns []string) map[string]int {
+func countFnInvocations(fns []string) map[string]int {
 	var invocations = make(map[string]int)
 	for i := 0; i < len(fns); i++ {
-		invocations[fns[i]]++
+		fn := fns[i]
+		invocations[fn]++
 	}
 	return invocations
 }
 
-func buildStackFromInput(input string) *Node {
-	lines := parseLines(input)
-	sort.Sort(byLength(lines))
-
-	var stackTree *Node
-	invocations := countInvocations(parseALLFuncs(lines))
-
-	for _, line := range lines {
-		fns := parseFuncs(line)
-
-		stackTree = buildTreeRoot(stackTree, fns, invocations)
-		addChild(stackTree, fns[1:], invocations)
-	}
-
-	return stackTree
-}
-
-func buildTreeRoot(stackTree *Node, fns []string, invocations map[string]int) *Node {
-	stackTree = stackTree.FindByNameDFS(stackTree, fns[0])
+func createTree(stackTree *Node, fns []string, invocations map[string]int) *Node {
+	stackTree = stackTree.FindByNameDFS(fns[0])
 	if stackTree == nil {
-		return New(fns[0], invocations[fns[0]])
+		stackTree = New(fns[0], 0)
 	}
-	stackTree.Invocations = invocations[fns[0]]
+	stackTree.Invocations += invocations[fns[0]]
 	return stackTree
 }
 
 func addChild(parent *Node, fns []string, invocations map[string]int) {
-	if len(fns) < 1 {
-		return
-	}
 	var child *Node
-	child = parent.FindByNameDFS(parent, fns[0])
-	if child == nil {
-		child = parent.AddChild(fns[0], invocations[fns[0]])
+	for i := 0; i < len(fns); i++ {
+		child = parent.FindByNameDFS(fns[i])
+		if child == nil {
+			child = parent.AddChild(fns[i], 0)
+		}
+		child.Invocations += invocations[fns[i]]
+		parent = child
 	}
-	addChild(child, fns[1:], invocations)
 }

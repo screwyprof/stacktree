@@ -65,19 +65,15 @@ func (n *Node) FindByNameBFS(root *Node, name string) *Node {
 	return nil
 }
 
-func (n *Node) FindByNameDFS(node *Node, name string) *Node {
-	if node == nil {
-		return nil
+func (n *Node) FindByNameDFS(name string) *Node {
+	if n.Name == name {
+		return n
 	}
 
-	if node.Name == name {
-		return node
-	}
-
-	if len(node.Children) > 0 {
+	if len(n.Children) > 0 {
 		var result *Node
-		for i := 0; result == nil && i < len(node.Children); i++ {
-			result = n.FindByNameDFS(node.Children[i], name)
+		for i := 0; result == nil && i < len(n.Children); i++ {
+			result = n.Children[i].FindByNameDFS(name)
 		}
 		return result
 	}
