@@ -70,14 +70,17 @@ func (n *Node) FindByNameDFS(name string) *Node {
 		return n
 	}
 
-	if len(n.Children) > 0 {
-		var result *Node
-		for i := 0; result == nil && i < len(n.Children); i++ {
-			result = n.Children[i].FindByNameDFS(name)
-		}
-		return result
+	if len(n.Children) < 1 {
+		return nil
 	}
-	return nil
+
+	var result *Node
+	for i := 0; result == nil && i < len(n.Children); i++ {
+		if n.Children[i].Name == name {
+			result = n.Children[i]
+		}
+	}
+	return result
 }
 
 func (n *Node) setParent(parent *Node) {
